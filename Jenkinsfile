@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        JAVA_HOME = tool name: 'OpenJDK-21', type: 'jdk'
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
-    }
-
     stages {
         stage('Prepare') {
             steps {
@@ -38,12 +33,12 @@ pipeline {
 
     post {
         always {
-            echo '🧹 Cleaning up workspace...'
+            echo '🧹 Deploying web'
             cleanWs()
         }
 
         success {
-            echo '✅ Build finished successfully.'
+            echo '✅ Web Deployed.'
         }
 
         failure {
