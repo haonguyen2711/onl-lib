@@ -1,0 +1,85 @@
+# Staging Environment Configuration
+server:
+  port: 8080
+
+spring:
+  application:
+    name: online-library-encryption-staging
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://sqlserver-staging:1433;databaseName=OnlineLibrary;encrypt=false;trustServerCertificate=true}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:OnlineLibStaging123!}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 20000
+    
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+        format_sql: false
+        
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:OnlineLibraryStagingSecretKey2024!}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+# RSA Keys for PDF encryption
+encryption:
+  rsa:
+    key-size: 2048
+    public-key-file: "keys/public.pem"
+    private-key-file: "keys/private.pem"
+  aes:
+    key-size: 256
+
+# File Storage
+storage:
+  base-path: "storage"
+  books-path: "storage/books"
+  keys-path: "keys"
+  temp-path: "storage/temp"
+
+# Watermark Configuration
+watermark:
+  font-size: 12
+  opacity: 0.5
+  color: "rgba(128,128,128,0.7)"
+  position: "bottom-left"
+
+# Staging logging
+logging:
+  level:
+    com.cmc: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [STAGING] - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/staging-application.log
+
+# Actuator for monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true

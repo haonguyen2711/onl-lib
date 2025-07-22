@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Library Encryption System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .feature {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .feature h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .feature p {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .api-info {
+            background: #e8f4fd;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #2196F3;
+        }
+        
+        .api-info h3 {
+            color: #1976D2;
+            margin-bottom: 15px;
+        }
+        
+        .api-endpoint {
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 5px 0;
+            font-family: monospace;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        .tech-stack {
+            margin-top: 40px;
+        }
+        
+        .tech-stack h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .status {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #4caf50;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📚🔐</div>
+        <h1>Online Library Encryption System</h1>
+        <p class="subtitle">
+            Hệ thống thư viện số an toàn với mã hóa AES-256-GCM & RSA-2048.<br>
+            Bảo vệ tài liệu PDF với watermark cá nhân hóa và phân quyền truy cập.
+        </p>
+        
+        <div class="status">
+            <strong>✅ Hệ thống đang hoạt động</strong> - API Server chạy tại localhost:8080/api
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔐</div>
+                <h3>Mã Hóa An Toàn</h3>
+                <p>File PDF được mã hóa bằng AES-256-GCM. AES key được bảo vệ bằng RSA-2048.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">💧</div>
+                <h3>Watermark Cá Nhân</h3>
+                <p>Mỗi trang sách có watermark riêng với email, tên và thời gian của người dùng.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">👥</div>
+                <h3>Phân Quyền Thông Minh</h3>
+                <p>3 cấp độ: Admin (upload), VIP (tải PDF), Standard (xem ảnh watermark).</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3>Theo Dõi Hoạt Động</h3>
+                <p>Ghi log tất cả hoạt động download và xem sách để bảo mật tốt hơn.</p>
+            </div>
+        </div>
+        
+        <div class="api-info">
+            <h3>🔌 API Endpoints Chính</h3>
+            <div class="api-endpoint">POST /api/auth/register - Đăng ký tài khoản</div>
+            <div class="api-endpoint">POST /api/auth/login - Đăng nhập</div>
+            <div class="api-endpoint">GET /api/books/list - Danh sách sách</div>
+            <div class="api-endpoint">GET /api/books/{id}/page/{page} - Xem trang sách</div>
+            <div class="api-endpoint">GET /api/books/{id}/download - Tải PDF (VIP only)</div>
+            <div class="api-endpoint">POST /api/books/upload - Upload sách (Admin only)</div>
+        </div>
+        
+        <div class="tech-stack">
+            <h3>🛠️ Công Nghệ Sử Dụng</h3>
+            <div class="tech-badges">
+                <span class="tech-badge">Java 21</span>
+                <span class="tech-badge">Spring Boot 3.2</span>
+                <span class="tech-badge">Spring Security</span>
+                <span class="tech-badge">JWT</span>
+                <span class="tech-badge">JPA/Hibernate</span>
+                <span class="tech-badge">MS SQL Server</span>
+                <span class="tech-badge">Apache PDFBox</span>
+                <span class="tech-badge">AES-256-GCM</span>
+                <span class="tech-badge">RSA-2048</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

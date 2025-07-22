@@ -1,0 +1,155 @@
+# Maven plugins configuration for CI/CD
+
+# Add these plugins to pom.xml for Jenkins integration
+
+# 1. JaCoCo Plugin (Code Coverage)
+<plugin>
+    <groupId>org.jacoco</groupId>
+    <artifactId>jacoco-maven-plugin</artifactId>
+    <version>0.8.8</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>prepare-agent</goal>
+            </goals>
+        </execution>
+        <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+                <goal>report</goal>
+            </goals>
+        </execution>
+        <execution>
+            <id>check</id>
+            <goals>
+                <goal>check</goal>
+            </goals>
+            <configuration>
+                <rules>
+                    <rule>
+                        <element>BUNDLE</element>
+                        <limits>
+                            <limit>
+                                <counter>INSTRUCTION</counter>
+                                <value>COVEREDRATIO</value>
+                                <minimum>0.80</minimum>
+                            </limit>
+                        </limits>
+                    </rule>
+                </rules>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+
+# 2. Surefire Plugin (Unit Tests)
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.0.0-M9</version>
+    <configuration>
+        <includes>
+            <include>**/*Test.java</include>
+        </includes>
+        <excludes>
+            <exclude>**/*IntegrationTest.java</exclude>
+        </excludes>
+        <reportFormat>xml</reportFormat>
+        <systemPropertyVariables>
+            <spring.profiles.active>test</spring.profiles.active>
+        </systemPropertyVariables>
+    </configuration>
+</plugin>
+
+# 3. Failsafe Plugin (Integration Tests)
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <version>3.0.0-M9</version>
+    <configuration>
+        <includes>
+            <include>**/*IntegrationTest.java</include>
+        </includes>
+        <systemPropertyVariables>
+            <spring.profiles.active>integration-test</spring.profiles.active>
+        </systemPropertyVariables>
+    </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+
+# 4. SpotBugs Plugin (Static Analysis)
+<plugin>
+    <groupId>com.github.spotbugs</groupId>
+    <artifactId>spotbugs-maven-plugin</artifactId>
+    <version>4.7.3.0</version>
+    <configuration>
+        <effort>Max</effort>
+        <threshold>Low</threshold>
+        <xmlOutput>true</xmlOutput>
+        <spotbugsXmlOutputDirectory>${project.build.directory}/spotbugs</spotbugsXmlOutputDirectory>
+        <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+    </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>check</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+
+# 5. OWASP Dependency Check
+<plugin>
+    <groupId>org.owasp</groupId>
+    <artifactId>dependency-check-maven</artifactId>
+    <version>8.4.0</version>
+    <configuration>
+        <format>ALL</format>
+        <outputDirectory>${project.build.directory}</outputDirectory>
+        <suppressionFile>owasp-suppressions.xml</suppressionFile>
+        <failBuildOnCVSS>7</failBuildOnCVSS>
+    </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>check</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+
+# 6. SonarQube Plugin
+<plugin>
+    <groupId>org.sonarsource.scanner.maven</groupId>
+    <artifactId>sonar-maven-plugin</artifactId>
+    <version>3.9.1.2184</version>
+</plugin>
+
+# 7. Build Helper Plugin (Add Integration Test Sources)
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>build-helper-maven-plugin</artifactId>
+    <version>3.4.0</version>
+    <executions>
+        <execution>
+            <id>add-integration-test-sources</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+                <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+                <sources>
+                    <source>src/integration-test/java</source>
+                </sources>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>

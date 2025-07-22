@@ -1,0 +1,108 @@
+# Production Environment Configuration
+server:
+  port: 8080
+
+spring:
+  application:
+    name: online-library-encryption-prod
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+    
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+        format_sql: false
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+      enabled: true
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+# RSA Keys for PDF encryption
+encryption:
+  rsa:
+    key-size: 2048
+    public-key-file: ${ENCRYPTION_RSA_PUBLIC_KEY_FILE:/app/keys/public.pem}
+    private-key-file: ${ENCRYPTION_RSA_PRIVATE_KEY_FILE:/app/keys/private.pem}
+  aes:
+    key-size: 256
+
+# File Storage
+storage:
+  base-path: ${STORAGE_BASE_PATH:/app/storage}
+  books-path: ${STORAGE_BOOKS_PATH:/app/storage/books}
+  keys-path: ${STORAGE_KEYS_PATH:/app/keys}
+  temp-path: ${STORAGE_TEMP_PATH:/app/storage/temp}
+
+# Watermark Configuration
+watermark:
+  font-size: ${WATERMARK_FONT_SIZE:12}
+  opacity: ${WATERMARK_OPACITY:0.5}
+  color: ${WATERMARK_COLOR:rgba(128,128,128,0.7)}
+  position: ${WATERMARK_POSITION:bottom-left}
+
+# Production logging
+logging:
+  level:
+    com.cmc: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.springframework.web: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [PROD] - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /var/log/onllib/application.log
+    max-size: 100MB
+    max-history: 30
+
+# Actuator for monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  security:
+    enabled: true
+
+# Security configurations
+security:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://onllib.com,https://www.onllib.com}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
