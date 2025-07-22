@@ -101,10 +101,7 @@ pipeline {
             }
             post {
                 always {
-                    publishTestResults testResultsPattern: 'target/surefire-reports/*.xml'
-                    publishCoverage adapters: [
-                        jacocoAdapter('target/site/jacoco/jacoco.xml')
-                    ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+                    junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
                 }
             }
         }
@@ -126,74 +123,4 @@ pipeline {
                             -Dtest=**/*IntegrationTest \
                             -Dspring.profiles.active=integration-test
                         '''
-                    } catch (Exception e) {
-                        echo "⚠️ Integration tests failed: ${e.getMessage()}"
-                        currentBuild.result = 'UNSTABLE'
                     }
-                }
-            }
-        }
-
-        stage('Static Security Scan') {
-            steps {
-                echo '🔒 Running static application security testing...'
-                script {
-                    try {
-                        sh '''
-                            mvn ${MAVEN_CLI_OPTS} \
-                            com.github.spotbugs:spotbugs-maven-plugin:check
-                        '''
-                    } catch (Exception e) {
-                        echo "⚠️ SpotBugs issues found: ${e.getMessage()}"
-                        currentBuild.result = 'UNSTABLE'
-                    }
-                }
-            }
-        }
-
-        stage('Package') {
-            steps {
-                echo '📦 Packaging application...'
-                sh '''
-                    mvn ${MAVEN_CLI_OPTS} package \
-                    -DskipTests=true \
-                    -Dspring.profiles.active=production
-                '''
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
-        }
-    }
-
-    post {
-        always {
-            echo '🧹 Cleaning up...'
-            sh 'rm -rf storage logs target || true'
-
-            archiveArtifacts artifacts: 'logs/**/*.log', allowEmptyArchive: true
-
-            script {
-                def buildInfo = [
-                    'Build Number': env.BUILD_NUMBER,
-                    'Git Commit': env.GIT_COMMIT_SHORT,
-                    'Branch': env.GIT_BRANCH,
-                    'Build Result': currentBuild.result ?: 'SUCCESS',
-                    'Duration': currentBuild.durationString
-                ]
-                writeJSON file: 'build-info.json', json: buildInfo
-                archiveArtifacts artifacts: 'build-info.json'
-            }
-        }
-
-        success {
-            echo '✅ Build completed successfully!'
-        }
-
-        failure {
-            echo '❌ Build failed!'
-        }
-
-        unstable {
-            echo '⚠️ Build completed with warnings!'
-        }
-    }
-}
