@@ -1,15 +1,18 @@
 # Build stage
-FROM eclipse-temurin:21-jdk-ubi10-minimal as builder
+FROM eclipse-temurin:21-jdk-ubi10-minimal AS builder
 
 WORKDIR /app
+
+# Copy Maven Wrapper and project files
+COPY mvnw .
+COPY mvnw.cmd .
+COPY .mvn ./.mvn
 COPY pom.xml .
 COPY src ./src
 
-# Install Maven
-RUN apt-get update && apt-get install -y maven
-
-# Build application
-RUN mvn clean package -DskipTests
+# Make Maven Wrapper executable and build
+RUN chmod +x mvnw && \
+    ./mvnw clean package -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jdk-ubi10-minimal
