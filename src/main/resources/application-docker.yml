@@ -5,12 +5,6 @@ server:
 spring:
   application:
     name: online-library-encryption
-  
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://sqlserver:1433;databaseName=OnlineLibrary;encrypt=false;trustServerCertificate=true}
-    username: ${SPRING_DATASOURCE_USERNAME:sa}
-    password: ${SPRING_DATASOURCE_PASSWORD:OnlineLib123!}
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     
   jpa:
     hibernate:

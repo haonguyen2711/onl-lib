@@ -33,6 +33,27 @@ echo ✓ storage/temp
 echo ✓ keys
 echo.
 
+REM Kiểm tra và hiển thị cấu hình database
+echo Database Configuration:
+if defined DB_URL (
+    echo ✓ DB_URL: %DB_URL%
+) else (
+    echo ⚪ DB_URL: Using default (localhost:1433)
+)
+
+if defined DB_USERNAME (
+    echo ✓ DB_USERNAME: %DB_USERNAME%
+) else (
+    echo ⚪ DB_USERNAME: Using default (sa)
+)
+
+if defined DB_PASSWORD (
+    echo ✓ DB_PASSWORD: *** (from environment)
+) else (
+    echo ⚪ DB_PASSWORD: Using default
+)
+echo.
+
 REM Build và chạy application
 echo Building application...
 call mvn clean package -DskipTests

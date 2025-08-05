@@ -1,32 +1,15 @@
 version: '3.8'
 
 services:
-  # SQL Server for Staging
-  sqlserver-staging:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: onllib-sqlserver-staging
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=OnlineLibStaging123!
-      - MSSQL_PID=Express
-    ports:
-      - "1434:1433"
-    volumes:
-      - sqlserver_staging_data:/var/opt/mssql
-      - ./sql:/docker-entrypoint-initdb.d
-    networks:
-      - onllib-staging-network
-    restart: unless-stopped
-
   # Online Library App - Staging
   onllib-app-staging:
     build: .
     container_name: onllib-app-staging
     environment:
       - SPRING_PROFILES_ACTIVE=staging
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver-staging:1433;databaseName=OnlineLibrary;encrypt=false;trustServerCertificate=true
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=OnlineLibStaging123!
+      - DB_URL=${DB_URL:-jdbc:sqlserver://host.docker.internal:1433;databaseName=OnlineLibraryStaging;encrypt=false;trustServerCertificate=true}
+      - DB_USERNAME=${DB_USERNAME:-sa}
+      - DB_PASSWORD=${DB_PASSWORD:-YourPassword123}
       - JWT_SECRET=OnlineLibraryStagingSecretKey2024!
       - SERVER_PORT=8080
     ports:
@@ -37,8 +20,6 @@ services:
       - onllib_staging_logs:/app/logs
     networks:
       - onllib-staging-network
-    depends_on:
-      - sqlserver-staging
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
@@ -61,8 +42,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  sqlserver_staging_data:
-    driver: local
   onllib_staging_storage:
     driver: local
   onllib_staging_keys:

@@ -1,37 +1,20 @@
 version: '3.8'
 
-services:
-  # SQL Server Database
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: onllib-sqlserver
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=OnlineLib123!
-      - MSSQL_PID=Express
-    ports:
-      - "1433:1433"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-      - ./sql:/docker-entrypoint-initdb.d
-    networks:
-      - onllib-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P OnlineLib123! -Q 'SELECT 1'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+# To override database settings, create .env file or export environment variables:
+# DB_URL=jdbc:sqlserver://your-host:1433;databaseName=YourDB;encrypt=false;trustServerCertificate=true
+# DB_USERNAME=your-username  
+# DB_PASSWORD=your-password
 
+services:
   # Online Library Application
   onllib-app:
     build: .
     container_name: onllib-app
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=OnlineLibrary;encrypt=false;trustServerCertificate=true
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=OnlineLib123!
+      - DB_URL=${DB_URL:-jdbc:sqlserver://host.docker.internal:1433;databaseName=OnlineLibrary;encrypt=false;trustServerCertificate=true}
+      - DB_USERNAME=${DB_USERNAME:-sa}
+      - DB_PASSWORD=${DB_PASSWORD:-YourPassword123}
     ports:
       - "8080:8080"
     volumes:
@@ -40,9 +23,6 @@ services:
       - onllib_logs:/app/logs
     networks:
       - onllib-network
-    depends_on:
-      sqlserver:
-        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
@@ -67,8 +47,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  sqlserver_data:
-    driver: local
   onllib_storage:
     driver: local
   onllib_keys:
