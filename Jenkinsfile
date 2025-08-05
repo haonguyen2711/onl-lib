@@ -33,9 +33,12 @@ pipeline {
                         script: 'git rev-parse --abbrev-ref HEAD',
                         returnStdout: true
                     ).trim()
+                    
+                    // Clean branch name for Docker tag (remove origin/ prefix and replace / with -)
+                    env.CLEAN_BRANCH = env.GIT_BRANCH.replaceAll('origin/', '').replaceAll('/', '-')
                 }
                 
-                echo "📝 Building commit: ${env.GIT_COMMIT_SHORT} on branch: ${env.GIT_BRANCH}"
+                echo "📝 Building commit: ${env.GIT_COMMIT_SHORT} on branch: ${env.GIT_BRANCH} (clean: ${env.CLEAN_BRANCH})"
             }
         }
         
@@ -60,12 +63,12 @@ pipeline {
                     def image = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
                     
                     // Tag with latest if main branch
-                    if (env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'master') {
+                    if (env.CLEAN_BRANCH == 'main' || env.CLEAN_BRANCH == 'master') {
                         image.tag('latest')
                     }
                     
-                    // Tag with branch name
-                    image.tag("${env.GIT_BRANCH}-${env.GIT_COMMIT_SHORT}")
+                    // Tag with branch name (using clean branch name)
+                    image.tag("${env.CLEAN_BRANCH}-${env.GIT_COMMIT_SHORT}")
                     
                     // Push to Docker Hub (default registry)
                     docker.withRegistry('', 'docker-hub-credentials') {
@@ -73,14 +76,14 @@ pipeline {
                         image.push("${DOCKER_TAG}")
                         
                         // Push latest tag if main/master branch
-                        if (env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'master') {
+                        if (env.CLEAN_BRANCH == 'main' || env.CLEAN_BRANCH == 'master') {
                             echo "🚀 Pushing ${DOCKER_IMAGE}:latest to Docker Hub..."
                             image.push('latest')
                         }
                         
                         // Push branch tag
-                        echo "🚀 Pushing ${DOCKER_IMAGE}:${env.GIT_BRANCH}-${env.GIT_COMMIT_SHORT} to Docker Hub..."
-                        image.push("${env.GIT_BRANCH}-${env.GIT_COMMIT_SHORT}")
+                        echo "🚀 Pushing ${DOCKER_IMAGE}:${env.CLEAN_BRANCH}-${env.GIT_COMMIT_SHORT} to Docker Hub..."
+                        image.push("${env.CLEAN_BRANCH}-${env.GIT_COMMIT_SHORT}")
                     }
                 }
             }
