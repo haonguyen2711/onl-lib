@@ -1,5 +1,5 @@
 # Build stage
-FROM openjdk:21-jdk-slim as builder
+FROM eclipse-temurin:21-jdk-ubi10-minimal as builder
 
 WORKDIR /app
 COPY pom.xml .
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y maven
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM openjdk:21-jre-slim
+FROM eclipse-temurin:21-jdk-ubi10-minimal
 
 WORKDIR /app
 

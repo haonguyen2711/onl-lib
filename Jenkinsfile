@@ -83,19 +83,15 @@ pipeline {
             // Archive logs
             archiveArtifacts artifacts: 'logs/**/*.log', allowEmptyArchive: true
             
-            // Publish build info
-            script {
-                def buildInfo = [
-                    'Build Number': env.BUILD_NUMBER,
-                    'Git Commit': env.GIT_COMMIT_SHORT,
-                    'Branch': env.GIT_BRANCH,
-                    'Build Result': currentBuild.result ?: 'SUCCESS',
-                    'Duration': currentBuild.durationString
-                ]
-                
-                writeJSON file: 'build-info.json', json: buildInfo
-                archiveArtifacts artifacts: 'build-info.json'
-            }
+            // Simple build info
+            echo """
+            📋 Build Information:
+            - Build Number: ${env.BUILD_NUMBER}
+            - Git Commit: ${env.GIT_COMMIT_SHORT}
+            - Branch: ${env.GIT_BRANCH}
+            - Build Result: ${currentBuild.result ?: 'SUCCESS'}
+            - Duration: ${currentBuild.durationString}
+            """
         }
         
         success {
