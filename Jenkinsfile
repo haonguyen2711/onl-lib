@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        // Maven settings
-        MAVEN_OPTS = '-Xmx1024m -XX:MaxPermSize=256m'
+        // Maven settings for Java 21
+        MAVEN_OPTS = '-Xmx1024m -Xms512m'
         MAVEN_CLI_OPTS = '--batch-mode --errors --fail-at-end --show-version'
         
         // Docker settings
