@@ -6,8 +6,8 @@ pipeline {
         MAVEN_OPTS = '-Xmx1024m -Xms512m'
         MAVEN_CLI_OPTS = '--batch-mode --errors --fail-at-end --show-version'
         
-        // Docker settings
-        DOCKER_IMAGE = 'onllib-app'
+        // Docker settings (cần có Docker Hub username)
+        DOCKER_IMAGE = 'haonguyen2711/onllib-app'  // Thay đổi username cho phù hợp
         DOCKER_TAG = "${BUILD_NUMBER}"
     }
     
@@ -53,9 +53,9 @@ pipeline {
             }
         }
         
-        stage('Docker Build') {
+        stage('Docker Build & Push') {
             steps {
-                echo '🐳 Building Docker image...'
+                echo '🐳 Building and pushing Docker image...'
                 script {
                     def image = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
                     
@@ -66,6 +66,22 @@ pipeline {
                     
                     // Tag with branch name
                     image.tag("${env.GIT_BRANCH}-${env.GIT_COMMIT_SHORT}")
+                    
+                    // Push to Docker Hub (default registry)
+                    docker.withRegistry('', 'docker-hub-credentials') {
+                        echo "🚀 Pushing ${DOCKER_IMAGE}:${DOCKER_TAG} to Docker Hub..."
+                        image.push("${DOCKER_TAG}")
+                        
+                        // Push latest tag if main/master branch
+                        if (env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'master') {
+                            echo "🚀 Pushing ${DOCKER_IMAGE}:latest to Docker Hub..."
+                            image.push('latest')
+                        }
+                        
+                        // Push branch tag
+                        echo "🚀 Pushing ${DOCKER_IMAGE}:${env.GIT_BRANCH}-${env.GIT_COMMIT_SHORT} to Docker Hub..."
+                        image.push("${env.GIT_BRANCH}-${env.GIT_COMMIT_SHORT}")
+                    }
                 }
             }
         }
