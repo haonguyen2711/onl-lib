@@ -11,11 +11,6 @@ pipeline {
         DOCKER_TAG = "${BUILD_NUMBER}"
     }
     
-    tools {
-        maven 'Maven-3.9.5' // Đảm bảo Maven đã được cấu hình trong Jenkins
-        jdk 'OpenJDK-21'    // Đảm bảo Java 21 đã được cấu hình trong Jenkins
-    }
-    
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timeout(time: 30, unit: 'MINUTES')
@@ -48,7 +43,8 @@ pipeline {
             steps {
                 echo '🔨 Building and packaging application...'
                 sh '''
-                    mvn ${MAVEN_CLI_OPTS} clean package \
+                    chmod +x mvnw
+                    ./mvnw ${MAVEN_CLI_OPTS} clean package \
                     -DskipTests=true
                 '''
                 
